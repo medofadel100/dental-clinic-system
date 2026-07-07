@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Megaphone, Send, CheckCircle2, AlertCircle } from "lucide-react";
-import { sendBroadcastMessage } from "./actions";
 
 export default function MarketingPage() {
   const [loading, setLoading] = useState(false);
@@ -14,13 +13,31 @@ export default function MarketingPage() {
     setResult(null);
 
     const formData = new FormData(e.currentTarget);
-    const res = await sendBroadcastMessage(formData);
-    
-    setResult(res);
-    setLoading(false);
-    
-    if (res.success) {
+    const message = formData.get("message") as string;
+
+    if (!message || message.trim() === "") {
+      setResult({ error: "الرجاء كتابة رسالة" });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Fetch directly from browser to local WhatsApp service
+      const waUrl = process.env.NEXT_PUBLIC_WHATSAPP_SERVICE_URL || "http://localhost:4000";
+      const res = await fetch(`${waUrl}/api/broadcast`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "فشل إرسال الرسائل");
+      setResult({ success: true, sentCount: data.sentCount, total: data.total });
       (e.target as HTMLFormElement).reset();
+    } catch (error: any) {
+      console.error("Broadcast Error:", error);
+      setResult({ error: "تعذر الاتصال بسيرفر الواتساب. تأكد أن البوت شغال على جهازك." });
+    } finally {
+      setLoading(false);
     }
   };
 
