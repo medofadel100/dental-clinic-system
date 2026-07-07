@@ -33,6 +33,16 @@ export default function WhatsAppSettingsPage() {
     return () => clearInterval(interval);
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      setStatus('loading');
+      await fetch("http://localhost:4000/api/logout", { method: "POST" });
+      setTimeout(fetchStatus, 2000); // Check again after a bit
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
       <div>
@@ -72,6 +82,24 @@ export default function WhatsAppSettingsPage() {
             <p style={{ color: "var(--text-secondary)" }}>
               البوت شغال دلوقتي وجاهز يبعت رسايل تأكيد المواعيد للمرضى.
             </p>
+            <button 
+              onClick={handleLogout}
+              style={{
+                marginTop: "1rem",
+                padding: "0.75rem 1.5rem",
+                backgroundColor: "var(--error)",
+                color: "white",
+                border: "none",
+                borderRadius: "var(--radius-md)",
+                cursor: "pointer",
+                fontWeight: "bold",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem"
+              }}
+            >
+              تسجيل الخروج من الحساب
+            </button>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>

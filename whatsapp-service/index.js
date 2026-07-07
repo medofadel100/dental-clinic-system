@@ -220,6 +220,30 @@ app.post('/api/send', async (req, res) => {
     }
 });
 
+app.post('/api/logout', async (req, res) => {
+    try {
+        if (sock) {
+            await sock.logout('Log out requested via dashboard');
+            sock = null;
+        }
+        isConnected = false;
+        qrCodeDataUrl = null;
+        
+        // Delete auth info directory
+        const authPath = path.join(__dirname, 'auth_info_baileys');
+        if (fs.existsSync(authPath)) {
+            fs.rmSync(authPath, { recursive: true, force: true });
+        }
+        
+        // Reconnect to generate new QR
+        connectToWhatsApp();
+        
+        res.json({ success: true, message: 'Logged out successfully.' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.post('/api/trigger-reschedule', async (req, res) => {
     try {
         const { phone, patientId, doctorId } = req.body;
