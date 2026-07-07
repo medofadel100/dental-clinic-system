@@ -1,0 +1,204 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pageTitle {
+  font-size: 1.75rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--primary);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  font-family: inherit;
+}
+
+.primaryBtn:hover {
+  background-color: var(--primary-hover);
+}
+
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.secondaryBtn:hover {
+  background-color: var(--border);
+}
+
+.backBtn {
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.backBtn:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--primary);
+}
+
+.tableCard, .formCard {
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  padding: 1.5rem;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  gap: 1rem;
+}
+
+.emptyIcon {
+  color: var(--border-focus);
+}
+
+.tableResponsive {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 1rem;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.table th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--bg-main);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+.boldCell {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.phoneCell {
+  font-family: monospace;
+  font-size: 1rem;
+  text-align: left;
+}
+
+.actionLink {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.actionLink:hover {
+  text-decoration: underline;
+}
+
+/* Form Styles */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.input, .textarea {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.input:focus, .textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+}
+
+.textarea {
+  resize: vertical;
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}

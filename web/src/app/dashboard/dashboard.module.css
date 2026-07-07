@@ -1,0 +1,241 @@
+/* Dashboard Layout Styles */
+.dashboardContainer {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-main);
+}
+
+.sidebar {
+  width: 280px;
+  background-color: var(--bg-surface);
+  border-left: 1px solid var(--border); /* Left border because RTL */
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  right: 0;
+  top: 0;
+  z-index: 40;
+}
+
+.sidebarHeader {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebarNav {
+  flex: 1;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: right;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.navItem:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--primary);
+}
+
+.sidebarFooter {
+  padding: 1.5rem 1rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.logoutBtn {
+  color: var(--error);
+}
+
+.logoutBtn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+
+/* Main Content Styles */
+.mainContent {
+  flex: 1;
+  margin-right: 280px; /* Offset for the sidebar in RTL */
+  display: flex;
+  flex-direction: column;
+}
+
+.topNav {
+  height: 70px;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+.userRole {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.pageContent {
+  padding: 2rem;
+  flex: 1;
+}
+
+/* Overview Page Styles */
+.overview {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.pageTitle {
+  font-size: 1.75rem;
+  color: var(--text-primary);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.statCard {
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: transform var(--transition-fast);
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.statIconWrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.chartsGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.chartCard {
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  min-height: 300px;
+}
+
+.chartCard h3 {
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+}
+
+.placeholderText {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  text-align: center;
+  margin-top: 4rem;
+}
+
+@media (max-width: 1024px) {
+  .chartsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(100%);
+  }
+  .mainContent {
+    margin-right: 0;
+  }
+}
