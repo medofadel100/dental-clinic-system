@@ -12,6 +12,13 @@ export const metadata: Metadata = {
   description: "أحدث نظام إدارة وعناية بالأسنان",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
