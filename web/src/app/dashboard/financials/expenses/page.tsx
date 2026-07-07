@@ -2,14 +2,26 @@ import { createClient } from "@/utils/supabase/server";
 import { TrendingDown, FileText, Plus } from "lucide-react";
 import Link from "next/link";
 
-export default async function ExpensesPage() {
+export default async function ExpensesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ start?: string; end?: string }>;
+}) {
   const supabase = await createClient();
+  const resolvedParams = await searchParams;
+  const startDate = resolvedParams.start;
+  const endDate = resolvedParams.end;
 
-  const { data: expenses } = await supabase
+  let query = supabase
     .from("expenses")
     .select(`id, amount, created_at, category, description, payment_method, receipt_number`)
     .neq('category', 'Salary')
     .order('created_at', { ascending: false });
+
+  if (startDate) query = query.gte("created_at", `${startDate}T00:00:00.000Z`);
+  if (endDate) query = query.lte("created_at", `${endDate}T23:59:59.999Z`);
+
+  const { data: expenses } = await query;
 
   const totalExpenses = expenses?.reduce((sum, exp) => sum + Number(exp.amount || 0), 0) || 0;
 
@@ -48,6 +60,20 @@ export default async function ExpensesPage() {
         </div>
       </div>
 
+      <form style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '2rem', backgroundColor: 'var(--bg-surface)', padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>من تاريخ</label>
+          <input type="date" name="start" defaultValue={startDate} style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', backgroundColor: 'var(--bg-main)', color: 'var(--text-primary)' }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>إلى تاريخ</label>
+          <input type="date" name="end" defaultValue={endDate} style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', backgroundColor: 'var(--bg-main)', color: 'var(--text-primary)' }} />
+        </div>
+        <button type="submit" style={{ padding: '0.75rem 1.5rem', height: '45px', backgroundColor: "var(--primary)", color: "white", border: "none", borderRadius: "var(--radius-md)", fontWeight: "bold", cursor: "pointer" }}>
+          تطبيق الفلتر
+        </button>
+      </form>
+
       <div style={{ backgroundColor: "var(--bg-surface)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border)", overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
@@ -61,7 +87,7 @@ export default async function ExpensesPage() {
           </thead>
           <tbody>
             {(!expenses || expenses.length === 0) ? (
-              <tr><td colSpan={5} style={{ padding: "2rem", textAlign: "center", color: "var(--text-secondary)" }}>لا توجد مصروفات مسجلة.</td></tr>
+              <tr><td colSpan={5} style={{ padding: "2rem", textAlign: "center", color: "var(--text-secondary)" }}>لا توجد مصروفات مسجلة بالفترة المحددة.</td></tr>
             ) : (
               expenses.map((exp: any) => (
                 <tr key={exp.id} style={{ borderBottom: "1px solid var(--border)" }}>

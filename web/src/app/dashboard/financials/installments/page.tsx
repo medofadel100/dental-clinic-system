@@ -6,14 +6,15 @@ import Link from "next/link";
 export default async function InstallmentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; start?: string; end?: string }>;
 }) {
   const supabase = await createClient();
   const resolvedParams = await searchParams;
   const activeTab = resolvedParams.tab || 'patients';
+  const startDate = resolvedParams.start;
+  const endDate = resolvedParams.end;
 
-  // Fetch unpaid or partial patient installments
-  const { data: patientInstallments } = await supabase
+  let patientQuery = supabase
     .from("installments")
     .select(`
       id, amount_due, amount_paid, session_number, status, created_at,
@@ -23,13 +24,19 @@ export default async function InstallmentsPage({
     .in('status', ['Unpaid', 'Partial'])
     .order('created_at', { ascending: false });
 
-  // Fetch clinic debts
-  // If the table doesn't exist yet, this might error, but the user will run the SQL to create it.
-  const { data: clinicDebts, error: debtsError } = await supabase
+  if (startDate) patientQuery = patientQuery.gte("created_at", `${startDate}T00:00:00.000Z`);
+  if (endDate) patientQuery = patientQuery.lte("created_at", `${endDate}T23:59:59.999Z`);
+  const { data: patientInstallments } = await patientQuery;
+
+  let clinicQuery = supabase
     .from("clinic_debts")
     .select('*')
     .order('is_paid', { ascending: true })
     .order('due_date', { ascending: true });
+
+  if (startDate) clinicQuery = clinicQuery.gte("due_date", startDate);
+  if (endDate) clinicQuery = clinicQuery.lte("due_date", endDate);
+  const { data: clinicDebts, error: debtsError } = await clinicQuery;
 
   const getPaymentMethodName = (method: string) => {
     const map: Record<string, string> = { Cash: "كاش", InstaPay: "انستا باي", VodafoneCash: "فودافون كاش", BankTransfer: "تحويل بنكي" };
@@ -52,7 +59,7 @@ export default async function InstallmentsPage({
 
       {/* Tabs */}
       <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem", borderBottom: "1px solid var(--border)", paddingBottom: "1rem" }}>
-        <Link href="?tab=patients" style={{
+        <Link href={`?tab=patients${startDate ? `&start=${startDate}` : ''}${endDate ? `&end=${endDate}` : ''}`} style={{
           padding: "0.75rem 1.5rem", borderRadius: "var(--radius-md)", fontWeight: 600, textDecoration: "none",
           backgroundColor: activeTab === 'patients' ? "var(--primary)" : "var(--bg-surface)",
           color: activeTab === 'patients' ? "white" : "var(--text-secondary)",
@@ -60,7 +67,7 @@ export default async function InstallmentsPage({
         }}>
           أقساط المرضى (للعيادة)
         </Link>
-        <Link href="?tab=clinic" style={{
+        <Link href={`?tab=clinic${startDate ? `&start=${startDate}` : ''}${endDate ? `&end=${endDate}` : ''}`} style={{
           padding: "0.75rem 1.5rem", borderRadius: "var(--radius-md)", fontWeight: 600, textDecoration: "none",
           backgroundColor: activeTab === 'clinic' ? "var(--primary)" : "var(--bg-surface)",
           color: activeTab === 'clinic' ? "white" : "var(--text-secondary)",
@@ -70,11 +77,26 @@ export default async function InstallmentsPage({
         </Link>
       </div>
 
+      <form style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '2rem', backgroundColor: 'var(--bg-surface)', padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
+        <input type="hidden" name="tab" value={activeTab} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>من تاريخ</label>
+          <input type="date" name="start" defaultValue={startDate} style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', backgroundColor: 'var(--bg-main)', color: 'var(--text-primary)' }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>إلى تاريخ</label>
+          <input type="date" name="end" defaultValue={endDate} style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', backgroundColor: 'var(--bg-main)', color: 'var(--text-primary)' }} />
+        </div>
+        <button type="submit" style={{ padding: '0.75rem 1.5rem', height: '45px', backgroundColor: "var(--primary)", color: "white", border: "none", borderRadius: "var(--radius-md)", fontWeight: "bold", cursor: "pointer" }}>
+          تطبيق الفلتر
+        </button>
+      </form>
+
       {activeTab === 'patients' && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {patientInstallments?.length === 0 ? (
             <div style={{ textAlign: "center", padding: "3rem", backgroundColor: "var(--bg-surface)", borderRadius: "var(--radius-lg)", border: "1px dashed var(--border)" }}>
-              <p style={{ color: "var(--text-secondary)" }}>لا توجد أي دفعات مستحقة حالياً على المرضى.</p>
+              <p style={{ color: "var(--text-secondary)" }}>لا توجد أي دفعات مستحقة حالياً على المرضى بالفترة المحددة.</p>
             </div>
           ) : (
             patientInstallments?.map((inst: any) => {
@@ -89,6 +111,7 @@ export default async function InstallmentsPage({
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                     <h3 style={{ margin: 0, fontSize: "1.1rem" }}>{inst.patients?.full_name}</h3>
                     <div style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>📞 {inst.patients?.phone}</div>
+                    <div style={{ color: "var(--text-secondary)", fontSize: "0.75rem", marginTop: "0.25rem" }}>تاريخ الجلسة: {new Date(inst.created_at).toLocaleDateString('ar-EG')}</div>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
                     <span style={{ fontWeight: 600, fontSize: "0.875rem", color: "var(--text-secondary)" }}>
@@ -149,7 +172,7 @@ export default async function InstallmentsPage({
               </div>
             ) : clinicDebts?.length === 0 ? (
               <div style={{ textAlign: "center", padding: "3rem", backgroundColor: "var(--bg-surface)", borderRadius: "var(--radius-lg)", border: "1px dashed var(--border)" }}>
-                <p style={{ color: "var(--text-secondary)" }}>لا توجد مديونيات أو أقساط مسجلة على العيادة.</p>
+                <p style={{ color: "var(--text-secondary)" }}>لا توجد مديونيات أو أقساط مسجلة على العيادة بالفترة المحددة.</p>
               </div>
             ) : (
               clinicDebts?.map((debt: any) => (

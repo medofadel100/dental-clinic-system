@@ -1,10 +1,17 @@
 import { createClient } from "@/utils/supabase/server";
 import { TrendingUp, FileText } from "lucide-react";
 
-export default async function IncomePage() {
+export default async function IncomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ start?: string; end?: string }>;
+}) {
   const supabase = await createClient();
+  const resolvedParams = await searchParams;
+  const startDate = resolvedParams.start;
+  const endDate = resolvedParams.end;
 
-  const { data: invoices } = await supabase
+  let query = supabase
     .from("invoices")
     .select(`
       id, amount_due, amount_paid, created_at, payment_method, status, receipt_number,
@@ -12,6 +19,11 @@ export default async function IncomePage() {
     `)
     .in('status', ['Paid', 'Partial'])
     .order('created_at', { ascending: false });
+
+  if (startDate) query = query.gte("created_at", `${startDate}T00:00:00.000Z`);
+  if (endDate) query = query.lte("created_at", `${endDate}T23:59:59.999Z`);
+
+  const { data: invoices } = await query;
 
   const totalIncome = invoices?.reduce((sum, inv) => sum + Number(inv.amount_paid || 0), 0) || 0;
 
@@ -37,6 +49,20 @@ export default async function IncomePage() {
         </div>
       </div>
 
+      <form style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '2rem', backgroundColor: 'var(--bg-surface)', padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>من تاريخ</label>
+          <input type="date" name="start" defaultValue={startDate} style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', backgroundColor: 'var(--bg-main)', color: 'var(--text-primary)' }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>إلى تاريخ</label>
+          <input type="date" name="end" defaultValue={endDate} style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', backgroundColor: 'var(--bg-main)', color: 'var(--text-primary)' }} />
+        </div>
+        <button type="submit" style={{ padding: '0.75rem 1.5rem', height: '45px', backgroundColor: "var(--primary)", color: "white", border: "none", borderRadius: "var(--radius-md)", fontWeight: "bold", cursor: "pointer" }}>
+          تطبيق الفلتر
+        </button>
+      </form>
+
       <div style={{ backgroundColor: "var(--bg-surface)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border)", overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
@@ -50,7 +76,7 @@ export default async function IncomePage() {
           </thead>
           <tbody>
             {(!invoices || invoices.length === 0) ? (
-              <tr><td colSpan={5} style={{ padding: "2rem", textAlign: "center", color: "var(--text-secondary)" }}>لا توجد إيرادات مسجلة.</td></tr>
+              <tr><td colSpan={5} style={{ padding: "2rem", textAlign: "center", color: "var(--text-secondary)" }}>لا توجد إيرادات مسجلة بالفترة المحددة.</td></tr>
             ) : (
               invoices.map((inv: any) => (
                 <tr key={inv.id} style={{ borderBottom: "1px solid var(--border)" }}>
