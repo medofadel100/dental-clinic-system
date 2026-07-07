@@ -141,7 +141,7 @@ async function handleIncomingMessage(patient, textMessage, supabase, sock, sende
             const activeApiKey = getNextApiKey();
             const genAI = new GoogleGenerativeAI(activeApiKey);
             const model = genAI.getGenerativeModel({ 
-                model: 'gemini-flash-latest', 
+                model: 'gemini-2.5-flash', 
                 tools: [{
                     functionDeclarations: [checkAvailabilityDecl, bookAppointmentDecl, registerPatientDecl]
                 }],

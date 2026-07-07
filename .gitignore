@@ -7,3 +7,5 @@ out/
 build/
 .vercel
 *.log
+whatsapp-service/auth_info_baileys/
+whatsapp-service/list-models.js

@@ -1,5 +1,5 @@
 import styles from "./dashboard.module.css";
-import { LayoutDashboard, Users, Calendar, Stethoscope, Settings, LogOut, Activity, Package, Megaphone, Banknote } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, Stethoscope, Settings, LogOut, Activity, Package, Megaphone, Banknote, Menu } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
@@ -29,6 +29,8 @@ export default async function DashboardLayout({
 
   return (
     <div className={styles.dashboardContainer}>
+      <input type="checkbox" id="mobile-sidebar-toggle" className={styles.sidebarToggleCheckbox} />
+      
       {/* Sidebar */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
@@ -115,6 +117,9 @@ export default async function DashboardLayout({
       <main className={styles.mainContent}>
         {/* Top Navbar */}
         <header className={styles.topNav}>
+          <label htmlFor="mobile-sidebar-toggle" className={styles.menuButton}>
+            <Menu size={24} />
+          </label>
           <div className={styles.userInfo}>
             <div className={styles.avatar}>
               {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : 'د'}

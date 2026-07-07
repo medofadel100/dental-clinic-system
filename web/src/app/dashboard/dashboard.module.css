@@ -137,6 +137,16 @@
 }
 
 /* Main Content Styles */
+.sidebarToggleCheckbox {
+  display: none;
+}
+
+.menuButton {
+  display: none;
+  cursor: pointer;
+  color: var(--primary);
+}
+
 .mainContent {
   flex: 1;
   margin-right: 280px; /* Offset for the sidebar in RTL */
@@ -291,10 +301,38 @@
 }
 
 @media (max-width: 768px) {
+  .menuButton {
+    display: block;
+    margin-left: auto;
+    margin-right: 0;
+  }
+  .topNav {
+    justify-content: flex-start;
+    padding: 0 1rem;
+    gap: 1rem;
+  }
   .sidebar {
     transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  .sidebarToggleCheckbox:checked ~ .sidebar {
+    transform: translateX(0);
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+  }
+  .sidebarToggleCheckbox:checked ~ .mainContent::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 35;
   }
   .mainContent {
     margin-right: 0;
+  }
+  .pageContent {
+    padding: 1rem;
   }
 }
