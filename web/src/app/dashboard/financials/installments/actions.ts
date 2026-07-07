@@ -45,3 +45,45 @@ export async function payInstallment(formData: FormData) {
 
   revalidatePath("/dashboard/financials/installments");
 }
+
+export async function addClinicDebt(formData: FormData) {
+  const supabase = await createClient();
+  const itemName = formData.get("item_name") as string;
+  const amount = parseFloat(formData.get("amount") as string);
+  const dueDate = formData.get("due_date") as string;
+
+  if (!itemName || isNaN(amount) || !dueDate) throw new Error("بيانات ناقصة");
+
+  const { error } = await supabase.from('clinic_debts').insert({
+    item_name: itemName,
+    amount,
+    due_date: dueDate
+  });
+
+  if (error) {
+    console.error(error);
+    throw new Error("فشل إضافة المديونية");
+  }
+  revalidatePath("/dashboard/financials/installments");
+}
+
+export async function payClinicDebt(formData: FormData) {
+  const supabase = await createClient();
+  const id = formData.get("debt_id") as string;
+  const paymentMethod = formData.get("payment_method") as string;
+  const receiptNumber = formData.get("receipt_number") as string;
+
+  if (!id || !paymentMethod) throw new Error("البيانات غير مكتملة");
+
+  const { error } = await supabase.from('clinic_debts').update({
+    is_paid: true,
+    payment_method: paymentMethod,
+    receipt_number: receiptNumber
+  }).eq('id', id);
+
+  if (error) {
+    console.error(error);
+    throw new Error("فشل تسديد المديونية");
+  }
+  revalidatePath("/dashboard/financials/installments");
+}
