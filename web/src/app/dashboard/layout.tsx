@@ -112,10 +112,14 @@ export default async function DashboardLayout({
         {/* Top Navbar */}
         <header className={styles.topNav}>
           <div className={styles.userInfo}>
-            <div className={styles.avatar}>د</div>
+            <div className={styles.avatar}>
+              {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : 'د'}
+            </div>
             <div className={styles.userDetails}>
-              <span className={styles.userName}>د. أحمد</span>
-              <span className={styles.userRole}>مدير العيادة</span>
+              <span className={styles.userName}>{profile?.full_name || 'مستخدم غير معروف'}</span>
+              <span className={styles.userRole}>
+                {role === 'Admin' ? 'مدير النظام' : role === 'Doctor' ? 'طبيب' : 'موظف استقبال'}
+              </span>
             </div>
           </div>
         </header>
