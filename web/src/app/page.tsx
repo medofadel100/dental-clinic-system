@@ -3,7 +3,7 @@ import styles from "./page.module.css";
 import { 
   Calendar, Shield, Activity, Phone, Star, 
   Clock, MapPin, CheckCircle, Smile, Sparkles, 
-  HeartPulse, ArrowLeft, Facebook, Instagram 
+  HeartPulse, ArrowLeft
 } from "lucide-react";
 
 export default function Home() {
@@ -170,8 +170,6 @@ export default function Home() {
               العيادة الرقمية الأولى المتخصصة في تقديم أحدث علاجات طب الأسنان باستخدام الذكاء الاصطناعي.
             </p>
             <div className={styles.socialLinks}>
-              <a href="#" className={styles.socialIcon}><Facebook size={20} /></a>
-              <a href="#" className={styles.socialIcon}><Instagram size={20} /></a>
               <a href={WHATSAPP_LINK} className={styles.socialIcon}><Phone size={20} /></a>
             </div>
           </div>
