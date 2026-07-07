@@ -1,5 +1,5 @@
 import styles from "./dashboard.module.css";
-import { LayoutDashboard, Users, Calendar, Stethoscope, Settings, LogOut, Activity, Package, Megaphone } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, Stethoscope, Settings, LogOut, Activity, Package, Megaphone, Banknote } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
@@ -63,17 +63,21 @@ export default async function DashboardLayout({
 
           {isAdmin && (
             <>
-              <Link href="/dashboard/financials" className={styles.navItem}>
-                <Activity size={20} />
-                <span>الحسابات المالية</span>
-              </Link>
-              <div className={styles.subMenu} style={{ paddingRight: "2rem", display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.875rem" }}>
-                <Link href="/dashboard/financials/income" className={styles.subNavItem} style={{ textDecoration: 'none', color: 'var(--text-secondary)' }}>الإيرادات</Link>
-                <Link href="/dashboard/financials/expenses" className={styles.subNavItem} style={{ textDecoration: 'none', color: 'var(--text-secondary)' }}>المصروفات</Link>
-                <Link href="/dashboard/financials/installments" className={styles.subNavItem} style={{ textDecoration: 'none', color: 'var(--text-secondary)' }}>الأقساط والدفعات</Link>
-                <Link href="/dashboard/financials/salaries" className={styles.subNavItem} style={{ textDecoration: 'none', color: 'var(--text-secondary)' }}>الرواتب</Link>
-                <Link href="/dashboard/financials/reports" className={styles.subNavItem} style={{ textDecoration: 'none', color: 'var(--text-secondary)' }}>التقارير المالية</Link>
-              </div>
+              <details className={styles.navDetails}>
+                <summary className={styles.navSummary}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <Banknote size={20} />
+                    <span>الحسابات المالية</span>
+                  </div>
+                </summary>
+                <div className={styles.subMenu}>
+                  <Link href="/dashboard/financials/income" className={styles.subNavItem}>الإيرادات</Link>
+                  <Link href="/dashboard/financials/expenses" className={styles.subNavItem}>المصروفات</Link>
+                  <Link href="/dashboard/financials/installments" className={styles.subNavItem}>الأقساط والدفعات</Link>
+                  <Link href="/dashboard/financials/salaries" className={styles.subNavItem}>الرواتب</Link>
+                  <Link href="/dashboard/financials/reports" className={styles.subNavItem}>التقارير المالية</Link>
+                </div>
+              </details>
 
               <Link href="/dashboard/staff" className={styles.navItem}>
                 <Users size={20} />

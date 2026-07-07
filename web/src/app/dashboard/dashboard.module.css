@@ -60,6 +60,65 @@
   color: var(--primary);
 }
 
+.navDetails {
+  width: 100%;
+}
+
+.navDetails[open] .navSummary {
+  background-color: rgba(59, 130, 246, 0.05);
+  color: var(--primary);
+}
+
+.navSummary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: right;
+  font-size: 1rem;
+  font-family: inherit;
+  list-style: none; /* Remove default arrow */
+}
+
+.navSummary::-webkit-details-marker {
+  display: none;
+}
+
+.navSummary:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--primary);
+}
+
+.subMenu {
+  padding-right: 2.5rem;
+  padding-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.subNavItem {
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.subNavItem:hover {
+  color: var(--primary);
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
 .sidebarFooter {
   padding: 1.5rem 1rem;
   border-top: 1px solid var(--border);
