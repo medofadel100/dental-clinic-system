@@ -1,6 +1,7 @@
-const { Client } = require('pg');
+const { Client } = require("pg");
 
-const connectionString = 'postgresql://postgres:Girl%4001223840100@db.fnrqvmglvfpsraehwhds.supabase.co:5432/postgres';
+const connectionString =
+  "postgresql://postgres:Girl%4001223840100@db.fnrqvmglvfpsraehwhds.supabase.co:5432/postgres";
 
 const sql = `
 -- 1. Add working_days to clinic_settings if it doesn't exist
@@ -28,11 +29,13 @@ async function runMigration() {
   const client = new Client({ connectionString });
   try {
     await client.connect();
-    console.log('Connected to Supabase DB');
+    console.log("Connected to Supabase DB");
     await client.query(sql);
-    console.log('Successfully created doctor_schedules table and updated clinic_settings.');
+    console.log(
+      "Successfully created doctor_schedules table and updated clinic_settings.",
+    );
   } catch (error) {
-    console.error('Error running migration:', error);
+    console.error("Error running migration:", error);
   } finally {
     await client.end();
   }

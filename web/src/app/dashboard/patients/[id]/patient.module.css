@@ -71,7 +71,8 @@
 }
 
 /* We can use an active class dynamically later, but for now hover handles it */
-.tab:active, .tab:focus {
+.tab:active,
+.tab:focus {
   color: var(--primary);
   border-bottom-color: var(--primary);
 }

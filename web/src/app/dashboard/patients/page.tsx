@@ -38,11 +38,22 @@ export default async function PatientsPage() {
                 {patients.map((patient: any) => (
                   <tr key={patient.id}>
                     <td className={styles.boldCell}>{patient.full_name}</td>
-                    <td dir="ltr" className={styles.phoneCell}>{patient.phone}</td>
-                    <td>{new Date(patient.date_of_birth).toLocaleDateString('ar-EG')}</td>
-                    <td>{new Date(patient.created_at).toLocaleDateString('ar-EG')}</td>
+                    <td dir="ltr" className={styles.phoneCell}>
+                      {patient.phone}
+                    </td>
                     <td>
-                      <Link href={`/dashboard/patients/${patient.id}`} className={styles.actionLink}>
+                      {new Date(patient.date_of_birth).toLocaleDateString(
+                        "ar-EG",
+                      )}
+                    </td>
+                    <td>
+                      {new Date(patient.created_at).toLocaleDateString("ar-EG")}
+                    </td>
+                    <td>
+                      <Link
+                        href={`/dashboard/patients/${patient.id}`}
+                        className={styles.actionLink}
+                      >
                         عرض الملف
                       </Link>
                     </td>

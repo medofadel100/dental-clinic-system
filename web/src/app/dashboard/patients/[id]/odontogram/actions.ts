@@ -1,21 +1,24 @@
-'use server'
+"use server";
 
-import { createClient } from '@/utils/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { createClient } from "@/utils/supabase/server";
+import { revalidatePath } from "next/cache";
 
-export async function saveOdontogramData(patientId: string, odontogramData: any) {
-  const supabase = await createClient()
+export async function saveOdontogramData(
+  patientId: string,
+  odontogramData: any,
+) {
+  const supabase = await createClient();
 
   // Update the patient's record with the new odontogram data
   const { error } = await supabase
-    .from('patients')
+    .from("patients")
     .update({ odontogram_data: odontogramData })
-    .eq('id', patientId)
+    .eq("id", patientId);
 
   if (error) {
-    console.error('Error saving odontogram:', error)
-    throw new Error('فشل حفظ المخطط')
+    console.error("Error saving odontogram:", error);
+    throw new Error("فشل حفظ المخطط");
   }
 
-  revalidatePath(`/dashboard/patients/${patientId}/odontogram`)
+  revalidatePath(`/dashboard/patients/${patientId}/odontogram`);
 }

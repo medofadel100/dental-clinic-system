@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import styles from './odontogram.module.css';
+import { useState } from "react";
+import styles from "./odontogram.module.css";
 
 const UPPER_RIGHT = [18, 17, 16, 15, 14, 13, 12, 11];
 const UPPER_LEFT = [21, 22, 23, 24, 25, 26, 27, 28];
@@ -9,27 +9,27 @@ const LOWER_RIGHT = [48, 47, 46, 45, 44, 43, 42, 41];
 const LOWER_LEFT = [31, 32, 33, 34, 35, 36, 37, 38];
 
 const CONDITIONS = [
-  { id: 'normal', label: 'سليم (Normal)', color: '#e2e8f0' },
-  { id: 'cavity', label: 'تسوس (Cavity)', color: '#ef4444' },
-  { id: 'extracted', label: 'مخلوع (Extracted)', color: '#94a3b8' },
-  { id: 'root_canal', label: 'عصب (Root Canal)', color: '#8b5cf6' },
-  { id: 'crown', label: 'طربوش (Crown)', color: '#f59e0b' },
-  { id: 'implant', label: 'زراعة (Implant)', color: '#0ea5e9' },
+  { id: "normal", label: "سليم (Normal)", color: "#e2e8f0" },
+  { id: "cavity", label: "تسوس (Cavity)", color: "#ef4444" },
+  { id: "extracted", label: "مخلوع (Extracted)", color: "#94a3b8" },
+  { id: "root_canal", label: "عصب (Root Canal)", color: "#8b5cf6" },
+  { id: "crown", label: "طربوش (Crown)", color: "#f59e0b" },
+  { id: "implant", label: "زراعة (Implant)", color: "#0ea5e9" },
 ];
 
-export default function Odontogram({ 
-  initialData = {}, 
+export default function Odontogram({
+  initialData = {},
   onSave,
   onChange,
-  hideSaveButton = false
-}: { 
-  initialData?: any; 
+  hideSaveButton = false,
+}: {
+  initialData?: any;
   onSave?: (data: any) => void;
   onChange?: (data: any) => void;
   hideSaveButton?: boolean;
 }) {
   const [data, setData] = useState<Record<number, string>>(initialData);
-  const [selectedCondition, setSelectedCondition] = useState<string>('cavity');
+  const [selectedCondition, setSelectedCondition] = useState<string>("cavity");
   const [isSaving, setIsSaving] = useState(false);
 
   const handleToothClick = (tooth: number) => {
@@ -49,24 +49,26 @@ export default function Odontogram({
   };
 
   const getToothColor = (tooth: number) => {
-    const conditionId = data[tooth] || 'normal';
-    return CONDITIONS.find(c => c.id === conditionId)?.color || '#e2e8f0';
+    const conditionId = data[tooth] || "normal";
+    return CONDITIONS.find((c) => c.id === conditionId)?.color || "#e2e8f0";
   };
 
   const renderToothRow = (teeth: number[]) => (
     <div className={styles.toothRow}>
-      {teeth.map(tooth => (
-        <div 
-          key={tooth} 
+      {teeth.map((tooth) => (
+        <div
+          key={tooth}
           className={styles.tooth}
           onClick={() => handleToothClick(tooth)}
           title={`سِنة ${tooth}`}
         >
-          <div 
-            className={styles.toothIcon} 
+          <div
+            className={styles.toothIcon}
             style={{ backgroundColor: getToothColor(tooth) }}
           >
-            {data[tooth] === 'extracted' && <div className={styles.crossLine}></div>}
+            {data[tooth] === "extracted" && (
+              <div className={styles.crossLine}></div>
+            )}
           </div>
           <span className={styles.toothNumber}>{tooth}</span>
         </div>
@@ -79,13 +81,16 @@ export default function Odontogram({
       <div className={styles.toolbar}>
         <h3>الحالات (Conditions)</h3>
         <div className={styles.conditionsList}>
-          {CONDITIONS.map(cond => (
+          {CONDITIONS.map((cond) => (
             <button
               key={cond.id}
-              className={`${styles.conditionBtn} ${selectedCondition === cond.id ? styles.active : ''}`}
+              className={`${styles.conditionBtn} ${selectedCondition === cond.id ? styles.active : ""}`}
               onClick={() => setSelectedCondition(cond.id)}
             >
-              <div className={styles.colorBox} style={{ backgroundColor: cond.color }}></div>
+              <div
+                className={styles.colorBox}
+                style={{ backgroundColor: cond.color }}
+              ></div>
               <span>{cond.label}</span>
             </button>
           ))}
@@ -99,7 +104,7 @@ export default function Odontogram({
             {renderToothRow(UPPER_RIGHT)}
             {renderToothRow(UPPER_LEFT)}
           </div>
-          
+
           <div className={styles.divider}>العلوي (Upper) | السفلي (Lower)</div>
 
           {/* Lower Jaw */}
@@ -112,12 +117,12 @@ export default function Odontogram({
 
       {!hideSaveButton && (
         <div className={styles.actions}>
-          <button 
-            className={styles.saveBtn} 
+          <button
+            className={styles.saveBtn}
             onClick={handleSave}
             disabled={isSaving}
           >
-            {isSaving ? 'جاري الحفظ...' : 'حفظ المخطط'}
+            {isSaving ? "جاري الحفظ..." : "حفظ المخطط"}
           </button>
         </div>
       )}

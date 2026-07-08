@@ -443,8 +443,12 @@
 }
 
 @keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ---- Mobile Slide-in Sidebar ---- */
@@ -489,7 +493,7 @@
 }
 
 .closeBtn {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
   cursor: pointer;
@@ -560,7 +564,9 @@
   font-size: 0.9rem;
   font-weight: 500;
   text-decoration: none;
-  transition: background-color 0.15s, color 0.15s;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
   background: none;
   border: none;
   width: 100%;
@@ -608,8 +614,14 @@
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .mobileSidebarSubLink {
@@ -619,7 +631,9 @@
   font-size: 0.85rem;
   border-radius: var(--radius-md);
   text-decoration: none;
-  transition: background-color 0.15s, color 0.15s;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -714,7 +728,7 @@
 }
 
 .bottomNavItemActive::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 25%;

@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
 import styles from "../patients.module.css";
 import { addPatient } from "../actions";
 import Link from "next/link";
 import { ArrowRight, Save } from "lucide-react";
-import { useFormState } from 'react-dom';
+import { useFormState } from "react-dom";
 import { useRef } from "react";
 
 // For React 18+ App Router, we use a simple wrapper or just a transition if we need error states
@@ -21,7 +21,12 @@ export default function NewPatientPage() {
       </div>
 
       <div className={styles.formCard}>
-        <form action={async (formData) => { await addPatient(formData) }} className={styles.form}>
+        <form
+          action={async (formData) => {
+            await addPatient(formData);
+          }}
+          className={styles.form}
+        >
           <div className={styles.formGrid}>
             <div className={styles.inputGroup}>
               <label htmlFor="full_name">الاسم بالكامل</label>

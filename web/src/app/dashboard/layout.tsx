@@ -1,5 +1,16 @@
 import styles from "./dashboard.module.css";
-import { LayoutDashboard, Users, Calendar, Stethoscope, Settings, LogOut, Activity, Package, Megaphone, Banknote } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  Calendar,
+  Stethoscope,
+  Settings,
+  LogOut,
+  Activity,
+  Package,
+  Megaphone,
+  Banknote,
+} from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
@@ -12,21 +23,23 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   if (!user) {
     redirect("/login");
   }
 
   const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
     .single();
 
-  const role = profile?.role || 'Receptionist';
-  const isAdmin = role === 'Admin';
-  const isDoctor = role === 'Doctor';
+  const role = profile?.role || "Receptionist";
+  const isAdmin = role === "Admin";
+  const isDoctor = role === "Doctor";
 
   return (
     <div className={styles.dashboardContainer}>
@@ -66,17 +79,48 @@ export default async function DashboardLayout({
             <>
               <details className={styles.navDetails}>
                 <summary className={styles.navSummary}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.75rem",
+                    }}
+                  >
                     <Banknote size={20} />
                     <span>الحسابات المالية</span>
                   </div>
                 </summary>
                 <div className={styles.subMenu}>
-                  <Link href="/dashboard/financials/income" className={styles.subNavItem}>الإيرادات</Link>
-                  <Link href="/dashboard/financials/expenses" className={styles.subNavItem}>المصروفات</Link>
-                  <Link href="/dashboard/financials/installments" className={styles.subNavItem}>الأقساط والدفعات</Link>
-                  <Link href="/dashboard/financials/salaries" className={styles.subNavItem}>الرواتب</Link>
-                  <Link href="/dashboard/financials/reports" className={styles.subNavItem}>التقارير المالية</Link>
+                  <Link
+                    href="/dashboard/financials/income"
+                    className={styles.subNavItem}
+                  >
+                    الإيرادات
+                  </Link>
+                  <Link
+                    href="/dashboard/financials/expenses"
+                    className={styles.subNavItem}
+                  >
+                    المصروفات
+                  </Link>
+                  <Link
+                    href="/dashboard/financials/installments"
+                    className={styles.subNavItem}
+                  >
+                    الأقساط والدفعات
+                  </Link>
+                  <Link
+                    href="/dashboard/financials/salaries"
+                    className={styles.subNavItem}
+                  >
+                    الرواتب
+                  </Link>
+                  <Link
+                    href="/dashboard/financials/reports"
+                    className={styles.subNavItem}
+                  >
+                    التقارير المالية
+                  </Link>
                 </div>
               </details>
 
@@ -104,7 +148,10 @@ export default async function DashboardLayout({
             </Link>
           )}
           <form action={logout}>
-            <button type="submit" className={`${styles.navItem} ${styles.logoutBtn}`}>
+            <button
+              type="submit"
+              className={`${styles.navItem} ${styles.logoutBtn}`}
+            >
               <LogOut size={20} />
               <span>تسجيل الخروج</span>
             </button>
@@ -116,7 +163,7 @@ export default async function DashboardLayout({
       <MobileSidebar
         isAdmin={isAdmin}
         isDoctor={isDoctor}
-        profileName={profile?.full_name || ''}
+        profileName={profile?.full_name || ""}
         role={role}
       />
 
@@ -126,21 +173,27 @@ export default async function DashboardLayout({
         <header className={styles.topNav}>
           <div className={styles.userInfo}>
             <div className={styles.avatar}>
-              {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : 'د'}
+              {profile?.full_name
+                ? profile.full_name.charAt(0).toUpperCase()
+                : "د"}
             </div>
             <div className={styles.userDetails}>
-              <span className={styles.userName}>{profile?.full_name || 'مستخدم غير معروف'}</span>
+              <span className={styles.userName}>
+                {profile?.full_name || "مستخدم غير معروف"}
+              </span>
               <span className={styles.userRole}>
-                {role === 'Admin' ? 'مدير النظام' : role === 'Doctor' ? 'طبيب' : 'موظف استقبال'}
+                {role === "Admin"
+                  ? "مدير النظام"
+                  : role === "Doctor"
+                    ? "طبيب"
+                    : "موظف استقبال"}
               </span>
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <div className={styles.pageContent}>
-          {children}
-        </div>
+        <div className={styles.pageContent}>{children}</div>
       </main>
     </div>
   );

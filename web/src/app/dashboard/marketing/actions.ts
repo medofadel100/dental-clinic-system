@@ -1,10 +1,10 @@
-'use server'
+"use server";
 
 import { createClient } from "@/utils/supabase/server";
 
 export async function sendBroadcastMessage(formData: FormData) {
   const message = formData.get("message") as string;
-  
+
   if (!message || message.trim() === "") {
     return { error: "الرجاء كتابة رسالة" };
   }
@@ -13,13 +13,13 @@ export async function sendBroadcastMessage(formData: FormData) {
     const res = await fetch("http://localhost:4000/api/broadcast", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({ message }),
     });
 
     const data = await res.json();
-    
+
     if (!res.ok) {
       throw new Error(data.error || "فشل إرسال الرسائل");
     }

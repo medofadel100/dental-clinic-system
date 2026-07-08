@@ -9,7 +9,7 @@ export default async function OdontogramPage({
 }) {
   const resolvedParams = await params;
   const supabase = await createClient();
-  
+
   // Fetch patient to get existing odontogram data
   const { data: patient } = await supabase
     .from("patients")
@@ -27,13 +27,19 @@ export default async function OdontogramPage({
 
   return (
     <div>
-      <h2 style={{ fontSize: "1.25rem", marginBottom: "1.5rem", color: "var(--text-primary)" }}>
+      <h2
+        style={{
+          fontSize: "1.25rem",
+          marginBottom: "1.5rem",
+          color: "var(--text-primary)",
+        }}
+      >
         مخطط الأسنان التفصيلي
       </h2>
       <p style={{ color: "var(--text-secondary)", marginBottom: "2rem" }}>
         اختر الحالة من الشريط، ثم اضغط على السن لتغيير حالته.
       </p>
-      
+
       <Odontogram initialData={initialData} onSave={handleSave} />
     </div>
   );

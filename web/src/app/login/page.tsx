@@ -30,7 +30,7 @@ export default function LoginPage({
               className={styles.input}
             />
           </div>
-          
+
           <div className={styles.inputGroup}>
             <label htmlFor="password">كلمة المرور</label>
             <input
@@ -48,9 +48,7 @@ export default function LoginPage({
           </button>
 
           {searchParams?.message && (
-            <div className={styles.errorMessage}>
-              {searchParams.message}
-            </div>
+            <div className={styles.errorMessage}>{searchParams.message}</div>
           )}
         </form>
       </div>

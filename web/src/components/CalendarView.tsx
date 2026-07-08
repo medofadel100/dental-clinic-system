@@ -1,38 +1,42 @@
-'use client'
+"use client";
 
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import moment from 'moment';
-import 'moment/locale/ar';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+import "moment/locale/ar";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-import RescheduleModal from '@/app/dashboard/appointments/RescheduleModal';
+import RescheduleModal from "@/app/dashboard/appointments/RescheduleModal";
 
 // Setup moment locale for Arabic
-moment.locale('ar-eg');
+moment.locale("ar-eg");
 const localizer = momentLocalizer(moment);
 
-export default function CalendarView({ initialEvents }: { initialEvents: any[] }) {
+export default function CalendarView({
+  initialEvents,
+}: {
+  initialEvents: any[];
+}) {
   const [events, setEvents] = useState(initialEvents);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
-  const [view, setView] = useState<any>('week');
+  const [view, setView] = useState<any>("week");
   const [date, setDate] = useState(new Date());
   const router = useRouter();
 
   const messages = {
-    allDay: 'طوال اليوم',
-    previous: 'السابق',
-    next: 'التالي',
-    today: 'اليوم',
-    month: 'شهر',
-    week: 'أسبوع',
-    day: 'يوم',
-    agenda: 'أجندة',
-    date: 'تاريخ',
-    time: 'وقت',
-    event: 'حدث',
-    noEventsInRange: 'لا يوجد مواعيد في هذه الفترة.',
+    allDay: "طوال اليوم",
+    previous: "السابق",
+    next: "التالي",
+    today: "اليوم",
+    month: "شهر",
+    week: "أسبوع",
+    day: "يوم",
+    agenda: "أجندة",
+    date: "تاريخ",
+    time: "وقت",
+    event: "حدث",
+    noEventsInRange: "لا يوجد مواعيد في هذه الفترة.",
   };
 
   const handleSelectSlot = (slotInfo: any) => {
@@ -45,7 +49,17 @@ export default function CalendarView({ initialEvents }: { initialEvents: any[] }
   };
 
   return (
-    <div style={{ height: '700px', width: '100%', direction: 'rtl', padding: '1rem', backgroundColor: 'var(--bg-surface)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}>
+    <div
+      style={{
+        height: "700px",
+        width: "100%",
+        direction: "rtl",
+        padding: "1rem",
+        backgroundColor: "var(--bg-surface)",
+        borderRadius: "var(--radius-lg)",
+        boxShadow: "var(--shadow-sm)",
+      }}
+    >
       <Calendar
         localizer={localizer}
         events={events}
@@ -61,29 +75,29 @@ export default function CalendarView({ initialEvents }: { initialEvents: any[] }
         onView={(v) => setView(v)}
         date={date}
         onNavigate={(d) => setDate(d)}
-        views={['month', 'week', 'day', 'agenda']}
+        views={["month", "week", "day", "agenda"]}
         rtl={true}
         eventPropGetter={(event) => {
-          let backgroundColor = 'var(--primary)';
-          if (event.status === 'Completed') backgroundColor = 'var(--success)';
-          if (event.status === 'Cancelled') backgroundColor = 'var(--error)';
-          return { 
-            style: { 
-              backgroundColor, 
-              borderRadius: '8px', 
-              border: 'none',
-              padding: '4px',
-              fontSize: '0.875rem',
+          let backgroundColor = "var(--primary)";
+          if (event.status === "Completed") backgroundColor = "var(--success)";
+          if (event.status === "Cancelled") backgroundColor = "var(--error)";
+          return {
+            style: {
+              backgroundColor,
+              borderRadius: "8px",
+              border: "none",
+              padding: "4px",
+              fontSize: "0.875rem",
               fontWeight: 600,
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            } 
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            },
           };
         }}
       />
       {selectedEvent && (
-        <RescheduleModal 
-          appointment={selectedEvent} 
-          onClose={() => setSelectedEvent(null)} 
+        <RescheduleModal
+          appointment={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
         />
       )}
     </div>
