@@ -33,7 +33,7 @@ export default function RescheduleModal({
         <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <p style={{ margin: 0, fontWeight: 600, color: 'var(--text-primary)' }}>المريض: {appointment.patients?.full_name}</p>
-            <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+            <p suppressHydrationWarning style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
               الموعد الحالي: {new Date(appointment.appointment_date).toLocaleString('ar-EG')}
             </p>
           </div>
