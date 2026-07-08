@@ -165,9 +165,47 @@ export async function askPatientToReschedule(formData: FormData) {
     .update({ status: "Cancelled" })
     .eq("id", appointmentId);
 
+  // Generate suggested slots
+  let suggestionText = "يرجى إخباري بالوقت المناسب لك لإعادة جدولته وسأقوم بعرض المواعيد المتاحة.";
+  try {
+    if (appt.doctor_id) {
+      const { data: schedules } = await supabase
+        .from("doctor_schedules")
+        .select("*")
+        .eq("doctor_id", appt.doctor_id)
+        .eq("is_active", true);
+
+      if (schedules && schedules.length > 0) {
+        const today = new Date();
+        const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+        const dayAfter = new Date(today); dayAfter.setDate(today.getDate() + 2);
+        
+        let targetDate = tomorrow;
+        let workingSchedule = schedules.find((s: any) => s.day_of_week === targetDate.getDay());
+        
+        if (!workingSchedule) {
+          targetDate = dayAfter;
+          workingSchedule = schedules.find((s: any) => s.day_of_week === targetDate.getDay());
+        }
+
+        if (workingSchedule) {
+          const dateStr = targetDate.toLocaleDateString("ar-EG", { weekday: "long" });
+          const start = workingSchedule.start_time.substring(0, 5);
+          suggestionText = `من أقرب المواعيد المتاحة مع طبيبك يوم ${dateStr} بداية من الساعة ${start}.\nوإذا لم يكن هذا الوقت مناسباً، يوجد مواعيد أخرى متاحة مع نخبة من أطبائنا الآخرين.\nما هو الوقت واليوم المناسب لك؟`;
+        } else {
+          suggestionText = "يرجى إخباري بالوقت واليوم المناسب لك لإعادة جدولته وسأقوم بعرض المواعيد المتاحة مع طبيبك، أو يمكنني عرض مواعيد أطباء آخرين إذا رغبت.";
+        }
+      } else {
+        suggestionText = "يرجى إخباري بالوقت واليوم المناسب لك لإعادة جدولته وسأقوم بعرض المواعيد المتاحة مع طبيبك، أو يمكنني عرض مواعيد أطباء آخرين إذا رغبت.";
+      }
+    }
+  } catch (err) {
+    console.error("Error generating slot suggestions:", err);
+  }
+
   // Trigger bot flow
   try {
-    const message = `نعتذر منك أ. ${appt.patients.full_name} 🗓️\nنظراً لظروف طارئة، تم إلغاء موعدك السابق.\nيرجى إخباري بالوقت المناسب لك لإعادة جدولته وسأقوم بعرض المواعيد المتاحة.`;
+    const message = `نعتذر منك أ. ${appt.patients.full_name} 🗓️\nنظراً لظروف طارئة، تم إلغاء موعدك السابق.\n${suggestionText}`;
     const { error: qError } = await getServiceClient()
       .from("whatsapp_queue")
       .insert({ phone: appt.patients.phone, message });
