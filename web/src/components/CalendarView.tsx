@@ -4,7 +4,7 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "moment/locale/ar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import RescheduleModal from "@/app/dashboard/appointments/RescheduleModal";
@@ -22,7 +22,16 @@ export default function CalendarView({
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [view, setView] = useState<any>("week");
   const [date, setDate] = useState(new Date());
+  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return <div style={{ height: "700px", width: "100%", backgroundColor: "var(--bg-surface)", borderRadius: "var(--radius-lg)" }} />;
+  }
 
   const messages = {
     allDay: "طوال اليوم",

@@ -1,6 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import dynamic from 'next/dynamic';
-const CalendarView = dynamic(() => import("@/components/CalendarView"), { ssr: false });
+import CalendarView from "@/components/CalendarView";
 import styles from "./appointments.module.css";
 import { Plus } from "lucide-react";
 
