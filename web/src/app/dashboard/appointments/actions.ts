@@ -1,7 +1,15 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
+
+const getServiceClient = () => {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+};
 
 export async function addAppointment(formData: FormData) {
   const supabase = await createClient();
@@ -85,9 +93,10 @@ export async function addAppointment(formData: FormData) {
         message = `تأكيد حجز موعد 📅\nأهلاً أ. ${patient.full_name}،\nتم تأكيد حجز موعدك في لومينا ديجيتال 🦷 يوم ${dateStr} الساعة ${timeStr}.\nنتمنى لك دوام الصحة.`;
       }
 
-      await supabase
+      const { error: qError } = await getServiceClient()
         .from("whatsapp_queue")
         .insert({ phone: patient.phone, message });
+      if (qError) console.error("Error queueing:", qError);
     } catch (err) {
       console.error("Error queueing WhatsApp notification:", err);
     }
@@ -122,9 +131,10 @@ export async function rescheduleManually(formData: FormData) {
     const message = `نعتذر منك أ. ${appointment.patients.full_name} 🗓️\nنظراً لظروف طارئة، تم تعديل موعدك ليكون يوم ${dateStr} الساعة ${timeStr}.\nنتمنى لك دوام الصحة.`;
 
     try {
-      await supabase
+      const { error: qError } = await getServiceClient()
         .from("whatsapp_queue")
         .insert({ phone: appointment.patients.phone, message });
+      if (qError) console.error("Error queueing:", qError);
     } catch (err) {
       console.error(err);
     }
@@ -142,7 +152,7 @@ export async function askPatientToReschedule(formData: FormData) {
   // Get appointment details
   const { data: appt } = await supabase
     .from("appointments")
-    .select("*, patients(phone)")
+    .select("*, patients(phone, full_name)")
     .eq("id", appointmentId)
     .single();
 
@@ -158,9 +168,10 @@ export async function askPatientToReschedule(formData: FormData) {
   // Trigger bot flow
   try {
     const message = `نعتذر منك أ. ${appt.patients.full_name} 🗓️\nنظراً لظروف طارئة، تم إلغاء موعدك السابق.\nيرجى إخباري بالوقت المناسب لك لإعادة جدولته وسأقوم بعرض المواعيد المتاحة.`;
-    await supabase
+    const { error: qError } = await getServiceClient()
       .from("whatsapp_queue")
       .insert({ phone: appt.patients.phone, message });
+    if (qError) console.error("Error queueing:", qError);
   } catch (err) {
     console.error(err);
   }
