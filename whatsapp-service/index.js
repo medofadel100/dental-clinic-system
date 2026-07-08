@@ -369,12 +369,44 @@ cron.schedule('0 * * * *', async () => {
                     let phone = appt.patients.phone.replace(/[^0-9]/g, '');
                     if (phone.startsWith('01')) phone = '2' + phone;
                     const jid = `${phone}@s.whatsapp.net`;
-                    await sock.sendMessage(jid, { text: `تذكير اقتراب الموعد ⏰\nنذكرك بأن موعدك بعد ساعة من الآن.\nنتمنى لك وصولاً آمناً 🦷.` });
+                    await sock.sendMessage(jid, { text: `تذكير اقتراب الموعد ⏰\nأهلاً أ. ${appt.patients.full_name} 🌸\nنذكرك بأن موعدك بعد ساعة تقريباً من الآن.\nنحن في انتظارك في العيادة ونتمنى لك دوام الصحة والعافية 🦷✨.` });
                 }
             }
         }
     } catch (err) {
         console.error('[Cron] Error running reminders:', err);
+    }
+});
+
+// Missed Appointment Follow-up (No-Show check)
+// Runs every 15 minutes
+cron.schedule('*/15 * * * *', async () => {
+    if (!isConnected || !sock) return;
+    try {
+        const missedStart = new Date();
+        missedStart.setMinutes(missedStart.getMinutes() - 45);
+        const missedEnd = new Date();
+        missedEnd.setMinutes(missedEnd.getMinutes() - 30);
+
+        const { data: missedAppts } = await supabase
+            .from('appointments')
+            .select('*, patients(*)')
+            .gte('appointment_date', missedStart.toISOString())
+            .lt('appointment_date', missedEnd.toISOString())
+            .eq('status', 'Scheduled');
+
+        if (missedAppts) {
+            for (const appt of missedAppts) {
+                if (appt.patients && appt.patients.phone) {
+                    let phone = appt.patients.phone.replace(/[^0-9]/g, '');
+                    if (phone.startsWith('01')) phone = '2' + phone;
+                    const jid = `${phone}@s.whatsapp.net`;
+                    await sock.sendMessage(jid, { text: `أهلاً بك أ. ${appt.patients.full_name} 🌸\nلاحظنا عدم حضورك لموعدك اليوم في العيادة، نتمنى أن تكون بصحة جيدة وألا يكون هناك أي مكروه منعك من الحضور 🥺.\nنحن حريصون جداً على صحتك، إذا كنت ترغب في تحديد موعد آخر في أقرب وقت، فقط أخبرنا وسنقوم بترتيبه لك فوراً! 🦷✨` });
+                }
+            }
+        }
+    } catch (err) {
+        console.error('[Cron] Error running missed appointment check:', err);
     }
 });
 
