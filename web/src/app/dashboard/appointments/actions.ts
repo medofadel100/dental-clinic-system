@@ -73,13 +73,9 @@ export async function addAppointment(formData: FormData) {
         message = `تأكيد حجز موعد 📅\nأهلاً أ. ${patient.full_name}،\nتم تأكيد حجز موعدك في لومينا ديجيتال 🦷 يوم ${dateStr} الساعة ${timeStr}.\nنتمنى لك دوام الصحة.`;
       }
 
-      await fetch('http://localhost:4000/api/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ number: patient.phone, message })
-      });
+      await supabase.from('whatsapp_queue').insert({ phone: patient.phone, message });
     } catch (err) {
-      console.error("Error sending WhatsApp notification:", err);
+      console.error("Error queueing WhatsApp notification:", err);
     }
   }
 
@@ -109,11 +105,7 @@ export async function rescheduleManually(formData: FormData) {
     const message = `نعتذر منك أ. ${appointment.patients.full_name} 🗓️\nنظراً لظروف طارئة، تم تعديل موعدك ليكون يوم ${dateStr} الساعة ${timeStr}.\nنتمنى لك دوام الصحة.`;
 
     try {
-      await fetch('http://localhost:4000/api/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ number: appointment.patients.phone, message })
-      });
+      await supabase.from('whatsapp_queue').insert({ phone: appointment.patients.phone, message });
     } catch (err) {
       console.error(err);
     }
@@ -142,15 +134,8 @@ export async function askPatientToReschedule(formData: FormData) {
 
   // Trigger bot flow
   try {
-    await fetch('http://localhost:4000/api/trigger-reschedule', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        phone: appt.patients.phone,
-        patientId: appt.patient_id,
-        doctorId: appt.doctor_id
-      })
-    });
+    const message = `نعتذر منك أ. ${appt.patients.full_name} 🗓️\nنظراً لظروف طارئة، تم إلغاء موعدك السابق.\nيرجى إخباري بالوقت المناسب لك لإعادة جدولته وسأقوم بعرض المواعيد المتاحة.`;
+    await supabase.from('whatsapp_queue').insert({ phone: appt.patients.phone, message });
   } catch (err) {
     console.error(err);
   }

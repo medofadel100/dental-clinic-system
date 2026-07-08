@@ -187,36 +187,6 @@ async function connectToWhatsApp() {
                 }
             }
 
-            // --- Intercept State-Based Conversations ---
-            if (stateAfterAuth === 'WAITING_SLOT_SELECTION') {
-                const choice = parseInt(textMessage.trim());
-                if (isNaN(choice) || choice < 1 || choice > conv.availableSlots.length) {
-                    await sock.sendMessage(senderJid, { text: `عذراً، الرجاء الرد برقم صحيح من 1 إلى ${conv.availableSlots.length} لاختيار الموعد، أو إرسال "إلغاء" للإلغاء.` });
-                    return;
-                }
-
-                const selectedSlot = conv.availableSlots[choice - 1];
-                
-                // Book the new appointment
-                const { error } = await supabase.from('appointments').insert([{
-                    patient_id: patient.id,
-                    doctor_id: conv.selectedDoctorId,
-                    appointment_date: new Date(selectedSlot.date).toISOString(),
-                    status: 'Scheduled',
-                    notes: 'تمت إعادة الجدولة تلقائياً عبر الواتساب'
-                }]);
-
-                if (error) {
-                    console.error('Error booking rescheduled appointment:', error);
-                    await sock.sendMessage(senderJid, { text: `حدث خطأ أثناء تأكيد الموعد. يرجى التواصل مع الاستقبال.` });
-                } else {
-                    await sock.sendMessage(senderJid, { text: `تم تأكيد موعدك الجديد بنجاح في: ${selectedSlot.text} 🦷.\nبانتظارك!` });
-                }
-
-                patientConversations[patientId] = { state: 'MAIN_MENU' };
-                return;
-            }
-
             // --- Hand over to Autonomous AI Agent ---
             try {
                 const { handleIncomingMessage } = require('./ai-agent');
@@ -555,5 +525,40 @@ app.post('/api/broadcast', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// WhatsApp Outbox Poller
+setInterval(async () => {
+    if (!isConnected || !sock) return;
+    try {
+        const { data: messages, error } = await supabase
+            .from('whatsapp_queue')
+            .select('*')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: true })
+            .limit(10);
+            
+        if (error || !messages || messages.length === 0) return;
+
+        for (const msg of messages) {
+            if (msg.phone && msg.message) {
+                let formattedNumber = msg.phone.replace(/[^0-9]/g, '');
+                if (formattedNumber.startsWith('01')) formattedNumber = '2' + formattedNumber;
+                const jid = `${formattedNumber}@s.whatsapp.net`;
+                
+                try {
+                    await sock.sendMessage(jid, { text: msg.message });
+                    await supabase.from('whatsapp_queue').update({ status: 'sent' }).eq('id', msg.id);
+                } catch(e) {
+                    console.error('Failed to send queue message:', e);
+                    await supabase.from('whatsapp_queue').update({ status: 'failed' }).eq('id', msg.id);
+                }
+            } else {
+                await supabase.from('whatsapp_queue').update({ status: 'invalid' }).eq('id', msg.id);
+            }
+        }
+    } catch (err) {
+        // Silent catch for missing table or network issues
+    }
+}, 3000);
 
 app.listen(process.env.PORT || 4000, '0.0.0.0', () => console.log(`WhatsApp Microservice is running on 0.0.0.0:4000`));
