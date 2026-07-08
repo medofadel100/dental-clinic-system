@@ -187,10 +187,43 @@ async function connectToWhatsApp() {
                 }
             }
 
+            // --- Intercept State-Based Conversations ---
+            if (stateAfterAuth === 'WAITING_SLOT_SELECTION') {
+                const choice = parseInt(textMessage.trim());
+                if (isNaN(choice) || choice < 1 || choice > conv.availableSlots.length) {
+                    await sock.sendMessage(senderJid, { text: `عذراً، الرجاء الرد برقم صحيح من 1 إلى ${conv.availableSlots.length} لاختيار الموعد، أو إرسال "إلغاء" للإلغاء.` });
+                    return;
+                }
+
+                const selectedSlot = conv.availableSlots[choice - 1];
+                
+                // Book the new appointment
+                const { error } = await supabase.from('appointments').insert([{
+                    patient_id: patient.id,
+                    doctor_id: conv.selectedDoctorId,
+                    appointment_date: new Date(selectedSlot.date).toISOString(),
+                    status: 'Scheduled',
+                    notes: 'تمت إعادة الجدولة تلقائياً عبر الواتساب'
+                }]);
+
+                if (error) {
+                    console.error('Error booking rescheduled appointment:', error);
+                    await sock.sendMessage(senderJid, { text: `حدث خطأ أثناء تأكيد الموعد. يرجى التواصل مع الاستقبال.` });
+                } else {
+                    await sock.sendMessage(senderJid, { text: `تم تأكيد موعدك الجديد بنجاح في: ${selectedSlot.text} 🦷.\nبانتظارك!` });
+                }
+
+                patientConversations[patientId] = { state: 'MAIN_MENU' };
+                return;
+            }
+
             // --- Hand over to Autonomous AI Agent ---
             try {
                 const { handleIncomingMessage } = require('./ai-agent');
-                await handleIncomingMessage(patient, textMessage, supabase, sock, senderJid);
+                await handleIncomingMessage(patient, textMessage, supabase, sock, senderJid, (newId) => {
+                    jidToPatient[senderJid] = newId;
+                    saveJidMap();
+                });
             } catch (aiErr) {
                 console.error("AI Agent Error:", aiErr);
                 await sock.sendMessage(senderJid, { text: "عذراً، أواجه مشكلة تقنية. يرجى التحدث مع الاستقبال." });
